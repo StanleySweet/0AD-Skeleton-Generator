@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import os
 
 COLLADA_SCHEMA_TEXT = "{http://www.collada.org/2005/11/COLLADASchema}"
-FILE_NAME = "E:\\Users\\dolci\\Desktop\\m_pants.dae"
+FILE_NAME = "E:\\Users\\dolci\\Desktop\\destination_arrows.dae"
 TREE = ET.parse(FILE_NAME)
 ROOT = TREE.getroot()
 
@@ -63,6 +63,10 @@ def recursive_load(xml_node, xml_node_root):
     """Recursively load all nodes"""
     if is_a_skeleton_node(xml_node_root):
         return ""
+
+    if "prop" in xml_node_root.attrib['id']:
+        return ""
+
     return ("<bone name=\"" + xml_node_root.attrib["id"]
             + "\">\n" + get_sub_nodes(xml_node, "./")
             + "</bone>\n")
@@ -71,6 +75,10 @@ def recursive_load_target(xml_node, xml_node_root):
     """Recursively load all nodes"""
     if is_a_skeleton_node(xml_node_root):
         return ""
+
+    if "prop" in xml_node_root.attrib['id']:
+        return ""
+
     return ("<bone name=\"" + xml_node_root.attrib["id"]
             + "\"><target>"+ xml_node_root.attrib["id"] + "</target>\n"
             + get_sub_nodes_target(xml_node, "./")
