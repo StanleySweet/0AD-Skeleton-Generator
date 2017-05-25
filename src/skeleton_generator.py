@@ -93,7 +93,7 @@ def write_xml():
     string += "</standard_skeleton>\n"
     string += "<skeleton title=\""+ get_armature_name() + " Skeleton\" target=\""
     string += get_armature_name() + "\">\n"
-    string += "<identifier><root>base</root></identifier>\n"
+    string += "<identifier><root>" + get_root_bone() + "</root></identifier>\n"
     string += get_skeleton_bones(recursive_load_target)
     string += "</skeleton>\n"
     string += "</skeletons>\n"
@@ -106,5 +106,19 @@ def save_skeleton_file():
     ET.ElementTree.write(ET.ElementTree(file_tree), file_handle)
     file_handle.close()
     print("Done generating file: " + os.getcwd() + "\\"+ get_armature_name() +".xml")
+
+def get_root_bone():
+    """Get the root bone """
+    nodes = ROOT.findall(COLLADA_SCHEMA_TEXT + "library_visual_scenes/" +
+                         COLLADA_SCHEMA_TEXT + "visual_scene/" +
+                         COLLADA_SCHEMA_TEXT + "node/")
+
+    for node in nodes:
+        if is_a_skeleton_node(node):
+            continue
+
+        return node.attrib["id"]
+
+    return ""
 
 save_skeleton_file()
