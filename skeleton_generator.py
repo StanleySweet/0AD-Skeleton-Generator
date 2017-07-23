@@ -3,9 +3,29 @@ import xml.etree.ElementTree as ET
 import os
 
 COLLADA_SCHEMA_TEXT = "{http://www.collada.org/2005/11/COLLADASchema}"
-FILE_NAME = "E:\\Users\\dolci\\Desktop\\destination_arrows.dae"
-TREE = ET.parse(FILE_NAME)
-ROOT = TREE.getroot()
+INPUT_DIRECTORY = os.path.dirname(os.path.realpath(__file__)) + "/input/"
+OUTPUT_DIRECTORY = os.path.dirname(os.path.realpath(__file__)) + "/output/"
+
+TREE = 0
+ROOT = 0
+
+def generate_skeletons():
+    """ Generate a skeleton for every file in the input folder """
+    for file in get_dae_files():
+        global TREE
+        global ROOT
+        TREE = ET.parse(INPUT_DIRECTORY + file)
+        ROOT = TREE.getroot()
+        save_skeleton_file()
+
+def get_dae_files():
+    """ Returns a list of dae files in the input directory """
+    files = []
+    for file in os.listdir(INPUT_DIRECTORY):
+        if ".dae" not in file:
+            continue
+        files.append(file)
+    return files
 
 def get_bone_names():
     """ Get the name of the bones inside of the dae file. """
@@ -101,11 +121,11 @@ def write_xml():
 
 def save_skeleton_file():
     """Save the final skeleton file"""
-    file_handle = open("./" + get_armature_name() + ".xml", "wb")
+    file_handle = open(OUTPUT_DIRECTORY + get_armature_name() + ".xml", "wb")
     file_tree = ET.fromstring(write_xml())
     ET.ElementTree.write(ET.ElementTree(file_tree), file_handle)
     file_handle.close()
-    print("Done generating file: " + os.getcwd() + "\\"+ get_armature_name() +".xml")
+    print("Done generating file: " + OUTPUT_DIRECTORY + get_armature_name() +".xml")
 
 def get_root_bone():
     """Get the root bone """
@@ -121,4 +141,4 @@ def get_root_bone():
 
     return ""
 
-save_skeleton_file()
+generate_skeletons()
