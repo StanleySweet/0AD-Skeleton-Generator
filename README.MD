@@ -11,8 +11,7 @@ Python 3.5 or above. (Tested with Python 3.6.1)
 USAGE
 =====
 
-To use simply edit the path to the dae file, and run the script.
-It will output the file in the current directory.
+To use, just drop the dae files in the input folder and launch the script using something like python ./skeleton_generator.py then you'll get every file in the output folder. Be careful, if you have two armatures with the same name they will get overwritten.
 
 LICENSE
 =======
