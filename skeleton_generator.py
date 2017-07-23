@@ -9,6 +9,19 @@ OUTPUT_DIRECTORY = os.path.dirname(os.path.realpath(__file__)) + "/output/"
 TREE = 0
 ROOT = 0
 
+def generate_skeletons_blender(input_dir, output_dir):
+    """ Generate a skeleton for every file in the input folder """
+    for file in get_dae_files():
+        global TREE
+        global ROOT
+        global INPUT_DIRECTORY
+        global OUTPUT_DIRECTORY
+        INPUT_DIRECTORY = input_dir
+        OUTPUT_DIRECTORY = output_dir
+        TREE = ET.parse(INPUT_DIRECTORY + file)
+        ROOT = TREE.getroot()
+        save_skeleton_file()
+
 def generate_skeletons():
     """ Generate a skeleton for every file in the input folder """
     for file in get_dae_files():
