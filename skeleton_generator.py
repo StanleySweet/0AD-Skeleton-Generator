@@ -99,8 +99,10 @@ def recursive_load(xml_node, xml_node_root):
 
     if "prop" in xml_node_root.attrib['id']:
         return ""
+    if "IK" in xml_node_root.attrib['id']:
+        return ""
 
-    return ("<bone name=\"" + xml_node_root.attrib["id"]
+    return ("<bone name=\"" + xml_node_root.attrib["id"].replace(get_armature_name() + '_', '')
             + "\">\n" + get_sub_nodes(xml_node, "./")
             + "</bone>\n")
 
@@ -111,22 +113,23 @@ def recursive_load_target(xml_node, xml_node_root):
 
     if "prop" in xml_node_root.attrib['id']:
         return ""
-
-    return ("<bone name=\"" + xml_node_root.attrib["id"]
-            + "\"><target>"+ xml_node_root.attrib["id"] + "</target>\n"
+    if "IK" in xml_node_root.attrib['id']:
+        return ""
+    return ("<bone name=\"" + xml_node_root.attrib["id"].replace(get_armature_name() + '_', '') 
+            + "\"><target>"+ xml_node_root.attrib["id"].replace(get_armature_name() + '_', '') + "</target>\n"
             + get_sub_nodes_target(xml_node, "./")
             + "</bone>\n")
 
 def write_xml():
     """Returns the skeleton xml string"""
     string = "<skeletons>\n"
-    string += "<standard_skeleton title=\""+ get_armature_name() + " Skeleton\" id=\""
+    string += "<standard_skeleton title=\""+ get_armature_name().replace("_", " ") + " Skeleton\" id=\""
     string += get_armature_name().replace(" ", "_") +"\">\n"
     string += get_skeleton_bones(recursive_load)
     string += "</standard_skeleton>\n"
-    string += "<skeleton title=\""+ get_armature_name() + " Skeleton\" target=\""
-    string += get_armature_name() + "\">\n"
-    string += "<identifier><root>" + get_root_bone() + "</root></identifier>\n"
+    string += "<skeleton title=\""+ get_armature_name().replace('_', ' ') + " Skeleton\" target=\""
+    string += get_armature_name().replace(" ", "_") + "\">\n"
+    string += "<identifier><root>" + get_root_bone().replace(get_armature_name() + '_', '') + "</root></identifier>\n"
     string += get_skeleton_bones(recursive_load_target)
     string += "</skeleton>\n"
     string += "</skeletons>\n"
