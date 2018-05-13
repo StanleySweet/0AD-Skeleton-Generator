@@ -55,7 +55,7 @@ def get_armature_name():
     "Gets the name of the armature"
     node = ROOT.find(COLLADA_SCHEMA_TEXT + "library_visual_scenes/" +
                      COLLADA_SCHEMA_TEXT + "visual_scene/")
-    return node.attrib.get("id")
+    return node.attrib.get("name")
 
 def is_a_skeleton_node(xml_node):
     """Defines wether the node belongs to the skeleton or not"""
@@ -102,9 +102,9 @@ def recursive_load(xml_node, xml_node_root):
     if "IK" in xml_node_root.attrib['id']:
         return ""
 
-    return ("<bone name=\"" + xml_node_root.attrib["id"].replace(get_armature_name() + '_', '')
-            + "\">\n" + get_sub_nodes(xml_node, "./")
-            + "</bone>\n")
+    return ("<bone name=\"" + xml_node_root.attrib["name"].replace(get_armature_name() + '_', '')
+            + "\">" + get_sub_nodes(xml_node, "./")
+            + "</bone>")
 
 def recursive_load_target(xml_node, xml_node_root):
     """Recursively load all nodes"""
@@ -115,32 +115,33 @@ def recursive_load_target(xml_node, xml_node_root):
         return ""
     if "IK" in xml_node_root.attrib['id']:
         return ""
-    return ("<bone name=\"" + xml_node_root.attrib["id"].replace(get_armature_name() + '_', '') 
-            + "\"><target>"+ xml_node_root.attrib["id"].replace(get_armature_name() + '_', '') + "</target>\n"
+    return ("<bone name=\"" + xml_node_root.attrib["name"].replace(get_armature_name() + '_', '') 
+            + "\"><target>"+ xml_node_root.attrib["name"].replace(get_armature_name() + '_', '') + "</target>"
             + get_sub_nodes_target(xml_node, "./")
-            + "</bone>\n")
+            + "</bone>")
 
 def write_xml():
     """Returns the skeleton xml string"""
-    string = "<skeletons>\n"
-    string += "<standard_skeleton title=\""+ get_armature_name().replace("_", " ") + " Skeleton\" id=\""
-    string += get_armature_name().replace(" ", "_") +"\">\n"
+    string = "<?xml version='1.0' encoding='utf8'?>"
+    string += "<skeletons>"
+    string += "<standard_skeleton title=\""+ get_armature_name().replace("_", " ") + "\" id=\""
+    string += get_armature_name().replace(" ", "_") +"\">"
     string += get_skeleton_bones(recursive_load)
-    string += "</standard_skeleton>\n"
-    string += "<skeleton title=\""+ get_armature_name().replace('_', ' ') + " Skeleton\" target=\""
-    string += get_armature_name().replace(" ", "_") + "\">\n"
-    string += "<identifier><root>" + get_root_bone().replace(get_armature_name() + '_', '') + "</root></identifier>\n"
+    string += "</standard_skeleton>"
+    string += "<skeleton title=\""+ get_armature_name().replace('_', ' ') + "\" target=\""
+    string += get_armature_name().replace(" ", "_") + "\">"
+    string += "<identifier><root>" + get_root_bone().replace(get_armature_name() + '_', '') + "</root></identifier>"
     string += get_skeleton_bones(recursive_load_target)
-    string += "</skeleton>\n"
-    string += "</skeletons>\n"
+    string += "</skeleton>"
+    string += "</skeletons>"
     return string
 
 def save_skeleton_file():
     """Save the final skeleton file"""
-    file_handle = open(OUTPUT_DIRECTORY + get_armature_name() + ".xml", "wb")
     file_tree = ET.fromstring(write_xml())
-    ET.ElementTree.write(ET.ElementTree(file_tree), file_handle)
-    file_handle.close()
+    indent(file_tree)
+    document = ET.ElementTree(file_tree)
+    document.write(OUTPUT_DIRECTORY + get_armature_name() + ".xml", encoding='utf-8', xml_declaration=True, short_empty_elements=True)
     print("Done generating file: " + OUTPUT_DIRECTORY + get_armature_name() +".xml")
 
 def get_root_bone():
@@ -153,8 +154,23 @@ def get_root_bone():
         if is_a_skeleton_node(node):
             continue
 
-        return node.attrib["id"]
+        return node.attrib["name"]
 
     return ""
+
+def indent(elem, level=0):
+    i = "\n" + level*"  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent(elem, level+1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
 
 generate_skeletons()
